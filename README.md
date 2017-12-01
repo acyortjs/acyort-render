@@ -1,5 +1,8 @@
 # acyort-render
 
+[![Build Status](https://travis-ci.org/acyortjs/acyort-render.svg?branch=master)](https://travis-ci.org/acyortjs/acyort-render)
+[![codecov](https://codecov.io/gh/acyortjs/acyort-render/branch/master/graph/badge.svg)](https://codecov.io/gh/acyortjs/acyort-render)
+
 Render for [AcyOrt](https://github.com/acyortjs/acyort)
 
 ## Install
