@@ -1,30 +1,45 @@
-const pathFn = require('path')
-const fs = require('fs')
 const yaml = require('yamljs')
-const Template = require('./template')
+const swig = require('swig-templates')
 
-class Renderer extends Template {
-  constructor(config) {
-    super(config)
-    this.publicDir = config.public_dir
-    this.callback = () => {}
+swig.setDefaults({
+  cache: false,
+  autoescape: false,
+})
+
+class Renderer {
+  constructor() {
+    this.templates = {}
   }
 
-  filePath(path) {
-    return pathFn.join(process.cwd(), this.publicDir, path)
+  compile(templates) {
+    templates.forEach((template) => {
+      const { tag, path } = template
+      this.templates[tag] = swig.compileFile(path)
+    })
   }
 
-  set status(fn) {
-    this.callback = fn
-  }
+  render(type, args) {
+    const {
+      tag,
+      path,
+      data,
+    } = args
 
-  render(path, tag, json) {
-    const template = this.templates[tag]
+    if (type === 'swig') {
+      const template = this.templates[tag]
 
-    if (template) {
-      fs.writeFileSync(this.filePath(path), template(data))
-      this.callback(path)
+      if (!template) {
+        return ''
+      }
+
+      return template(data)
     }
+
+    if (data) {
+      return yaml.parse(data.toString())
+    }
+
+    return yaml.load(path)
   }
 }
 
