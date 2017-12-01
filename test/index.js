@@ -1,35 +1,63 @@
 const path = require('path')
+const assert = require('power-assert')
 const Renderer = require('../')
 
 function dir(file) {
   return path.join(__dirname, 'fixtures', file)
 }
 
-const renderer = new Renderer()
+String.prototype.trim = function() {
+  return this
+    .replace(/\n/g, '')
+    .replace(/[\t ]+\</g, '<')
+    .replace(/\>[\t ]+\</g, '><')
+    .replace(/\>[\t ]+$/g, '>')
+}
 
-renderer.compile([{
-  tag: 'home',
-  path: dir('home.html')
-}])
+describe('renderer', () => {
+  it('swig', () => {
+    const renderer = new Renderer()
 
-console.log(
-  renderer.render('swig', {
-    tag: 'home',
-    data: {
-      title: 'AcyOrt',
-      body: '<p>text</p>'
-    }
+    renderer.compile([{
+      tag: 'home',
+      path: dir('home.html')
+    }])
+
+    const result = renderer.render('swig', {
+      tag: 'home',
+      data: {
+        title: 'AcyOrt',
+        body: '<p>text</p>'
+      }
+    })
+
+    assert(result.trim() === '<h1>AcyOrt</h1><div><p>text</p></div>')
   })
-)
 
-console.log(
-  renderer.render('yaml', {
-    path: dir('config.yml')
+  it('no content', () => {
+    const renderer = new Renderer()
+    const result = renderer.render('swig', {
+      tag: 'home',
+      data: { title: 'AcyOrt' }
+    })
+    assert(result.trim() === '')
   })
-)
 
-console.log(
-  renderer.render('yaml', {
-    data: 'title: AcyOrt'
+  it('load yaml', () => {
+    const renderer = new Renderer()
+    const result = renderer.render('yaml', {
+      path: dir('config.yml')
+    })
+
+    assert(result.title === 'AcyOrt')
   })
-)
+
+  it('parse yaml text', () => {
+    const renderer = new Renderer()
+    const result = renderer.render('yaml', {
+      data: 'title: AcyOrt'
+    })
+
+    assert(result.title === 'AcyOrt')
+  })
+})
