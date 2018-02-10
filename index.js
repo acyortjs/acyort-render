@@ -6,41 +6,18 @@ swig.setDefaults({
   autoescape: false,
 })
 
-class Renderer {
-  constructor() {
-    this.templates = {}
+function render(type, args) {
+  const { path, data } = args
+
+  if (type === 'swig') {
+    return swig.renderFile(path, data)
   }
 
-  compile(templates) {
-    templates.forEach((template) => {
-      const { tag, path } = template
-      this.templates[tag] = swig.compileFile(path)
-    })
+  if (data) {
+    return yaml.parse(data.toString())
   }
 
-  render(type, args) {
-    const {
-      tag,
-      path,
-      data,
-    } = args
-
-    if (type === 'swig') {
-      const template = this.templates[tag]
-
-      if (!template) {
-        return ''
-      }
-
-      return template(data)
-    }
-
-    if (data) {
-      return yaml.parse(data.toString())
-    }
-
-    return yaml.load(path)
-  }
+  return yaml.load(path)
 }
 
-module.exports = Renderer
+module.exports = render

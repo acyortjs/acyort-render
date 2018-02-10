@@ -15,13 +15,11 @@ $ npm i acyort-render -S
 
 ```js
 const path = require('path')
-const Renderer = require('acyort-render')
+const render = require('acyort-render')
 
 function dir(file) {
   return path.join(__dirname, file)
 }
-
-const renderer = new Renderer()
 
 /*
 home.html
@@ -29,14 +27,10 @@ home.html
 <h1>{{ title }}</h1>
 <div>{{ body }}</div>
 */
-renderer.compile([{
-  tag: 'home',
-  path: dir('home.html')
-}])
 
 console.log(
-  renderer.render('swig', {
-    tag: 'home',
+  render('swig', {
+    path: dir('home.html'),
     data: {
       title: 'AcyOrt',
       body: '<p>text</p>'
@@ -49,7 +43,7 @@ console.log(
 */
 
 console.log(
-  renderer.render('yaml', {
+  render('yaml', {
     path: dir('config.yml')
   })
 )
