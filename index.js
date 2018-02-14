@@ -6,18 +6,42 @@ swig.setDefaults({
   autoescape: false,
 })
 
-function render(type, args) {
-  const { path, data } = args
-
-  if (type === 'swig') {
-    return swig.renderFile(path, data)
+class Renderer {
+  constructor() {
+    this.engines = {
+      swig: {
+        render: (text, data) => swig.render(text, { locals: data }),
+        renderFile: swig.renderFile,
+      },
+      yaml: {
+        render: yaml.parse.bind(yaml),
+        renderFile: yaml.load.bind(yaml),
+      },
+    }
+    this.engine = 'swig'
   }
 
-  if (data) {
-    return yaml.parse(data.toString())
+  register(engine, args) {
+    if (!this.engines[engine]) {
+      this.engines[engine] = args
+    }
+    return this
   }
 
-  return yaml.load(path)
+  use(engine) {
+    if (this.engines[engine]) {
+      this.engine = engine
+    }
+    return this
+  }
+
+  render(text, data) {
+    return this.engines[this.engine].render(text, data)
+  }
+
+  renderFile(file, data) {
+    return this.engines[this.engine].renderFile(file, data)
+  }
 }
 
-module.exports = render
+module.exports = Renderer
