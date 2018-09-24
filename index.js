@@ -1,47 +1,48 @@
-const yaml = require('yamljs')
+const { readFileSync } = require('fs')
+const yaml = require('js-yaml')
 const swig = require('swig-templates')
+const Markdown = require('@acyort/markdown')
 
 swig.setDefaults({
   cache: false,
   autoescape: false,
 })
 
-class Renderer {
+const markdown = new Markdown({ lineNumbers: true })
+
+module.exports = class {
   constructor() {
     this.engines = {
       swig: {
-        render: (text, data) => swig.render(text, { locals: data }),
+        render: (text, data, ...params) => swig.render(text, { locals: data }, ...params),
         renderFile: swig.renderFile,
       },
       yaml: {
-        render: yaml.parse.bind(yaml),
-        renderFile: yaml.load.bind(yaml),
+        render: yaml.safeLoad,
+        renderFile: (path, ...params) => yaml.safeLoad(readFileSync(path, 'utf8'), ...params),
+      },
+      markdown: {
+        render: markdown.parse,
+        renderFile: (path, ...params) => markdown.parse(readFileSync(path, 'utf8'), ...params),
       },
     }
-    this.engine = 'swig'
   }
 
-  register(engine, args) {
+  register(engine, methods) {
+    this.engines[engine] = methods
+  }
+
+  render(engine, ...params) {
     if (!this.engines[engine]) {
-      this.engines[engine] = args
+      throw new Error('Cannot find this render engine')
     }
-    return this
+    return this.engines[engine].render(...params)
   }
 
-  use(engine) {
-    if (this.engines[engine]) {
-      this.engine = engine
+  renderFile(engine, ...params) {
+    if (!this.engines[engine]) {
+      throw new Error('Cannot find this render engine')
     }
-    return this
-  }
-
-  render(text, data) {
-    return this.engines[this.engine].render(text, data)
-  }
-
-  renderFile(file, data) {
-    return this.engines[this.engine].renderFile(file, data)
+    return this.engines[engine].renderFile(...params)
   }
 }
-
-module.exports = Renderer
