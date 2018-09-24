@@ -1,42 +1,44 @@
 {
-  "name": "acyort-render",
-  "version": "1.0.1",
-  "description": "Renderer for AcyOrt",
+  "name": "@acyort/renderer",
+  "version": "1.0.0",
+  "description": "Node Renderer",
   "main": "index.js",
   "scripts": {
     "test": "npm run test:lint && npm run test:cover",
     "test:unit": "mocha --reporter dot --require intelli-espower-loader ./test",
     "test:lint": "eslint .",
-    "test:cover": "istanbul cover --print both _mocha ./test"
+    "test:cover": "nyc npm run test:unit",
+    "coverage": "nyc report --reporter=lcov npm run test:unit"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/acyortjs/acyort-render.git"
+    "url": "git+https://github.com/acyortjs/renderer.git"
   },
   "keywords": [
     "render",
-    "acyort",
     "swig",
-    "blog"
+    "yaml",
+    "markdown"
   ],
-  "author": "LoeiFy@gmail.com",
+  "author": "LoeiFy <LoeiFy@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/acyortjs/acyort-render/issues"
+    "url": "https://github.com/acyortjs/renderer/issues"
   },
-  "homepage": "https://github.com/acyortjs/acyort-render#readme",
+  "homepage": "https://github.com/acyortjs/renderer#readme",
   "devDependencies": {
-    "ejs": "^2.5.7",
-    "eslint": "^4.12.0",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0",
+    "ejs": "^2.6.1",
+    "eslint": "^5.6.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
     "intelli-espower-loader": "^1.0.1",
-    "istanbul": "^0.4.5",
-    "mocha": "^4.0.1",
-    "power-assert": "^1.4.4"
+    "mocha": "^5.2.0",
+    "nyc": "^13.0.1",
+    "power-assert": "^1.6.1"
   },
   "dependencies": {
-    "swig-templates": "^2.0.2",
-    "yamljs": "^0.3.0"
+    "@acyort/markdown": "^1.0.0",
+    "js-yaml": "^3.12.0",
+    "swig-templates": "^2.0.3"
   }
 }
