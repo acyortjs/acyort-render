@@ -3,6 +3,7 @@ const assert = require('power-assert')
 const ejs = require('ejs')
 const Renderer = require('../')
 const fs = require('fs')
+const expect = require('expect')
 
 function dir(file) {
   return path.join(__dirname, 'fixtures', file)
@@ -20,62 +21,61 @@ const renderer = new Renderer()
 
 describe('renderer', () => {
   it('swig render file', () => {
-    const result = renderer.renderFile(
-      dir('home.html'),
-      {
-        title: 'AcyOrt',
-        body: '<p>text</p>'
-      }
-    )
-
-    assert(result.trim() === '<h1>AcyOrt</h1><div><p>text</p></div>')
+    const result = renderer.renderFile('swig', dir('home.html'), { title: 'swig' })
+    assert(result.trim() === '<h1>swig</h1>')
   })
 
   it('swig render', () => {
     const result = renderer.render(
+      'swig',
       fs.readFileSync(dir('home.html')).toString(),
-      {
-        title: 'AcyOrt',
-        body: '<p>text</p>'
-      }
+      { title: 'swig' }
     )
-
-    assert(result.trim() === '<h1>AcyOrt</h1><div><p>text</p></div>')
+    assert(result.trim() === '<h1>swig</h1>')
   })
 
   it('yaml render file', () => {
-    renderer.use('yaml')
-    const result = renderer.renderFile(dir('config.yml'))
-    assert(result.title === 'AcyOrt')
+    const result = renderer.renderFile('yaml', dir('config.yml'))
+    assert(result.title === 'yaml')
   })
 
   it('yaml render text', () => {
-    renderer.use('yaml')
-    const result = renderer.render('title: AcyOrt')
-    assert(result.title === 'AcyOrt')
+    const result = renderer.render('yaml', 'title: yaml')
+    assert(result.title === 'yaml')
+  })
+
+  it('markdown render text', () => {
+    const result = renderer.render('markdown', '# h1', { simpleMode: true })
+    assert(result.trim() === '<h1>h1</h1>')
+  })
+
+  it('markdown render file', () => {
+    const result = renderer.renderFile('markdown', dir('markdown.md'))
+    assert(result.trim() === '<h1><a href="#h1" id="h1" class="heading"></a>h1</h1>')
   })
 
   it('add engine', () => {
-    renderer
-      .register('ejs', {
-        render: ejs.render,
-        renderFile: (file, data) => {
-          const text = fs.readFileSync(file).toString()
-          return ejs.render(text, data)
-        }
-      })
-      .use('ejs')
+    renderer.register('ejs', {
+      render: ejs.render,
+      renderFile: (file, data) => {
+        const text = fs.readFileSync(file).toString()
+        return ejs.render(text, data)
+      }
+    })
 
-    let result = renderer.render(fs.readFileSync(dir('ejs.html')).toString(), { title: 'AcyOrt' })
-    assert(result.trim() === '<h1>AcyOrt</h1>')
+    let result = renderer.render(
+      'ejs',
+      fs.readFileSync(dir('ejs.html')).toString(),
+      { title: 'ejs' }
+    )
+    assert(result.trim() === '<h1>ejs</h1>')
 
-    result = renderer.renderFile(dir('ejs.html'), { title: 'AcyOrt' })
-    assert(result.trim() === '<h1>AcyOrt</h1>')
+    result = renderer.renderFile('ejs', dir('ejs.html'), { title: 'ejs' })
+    assert(result.trim() === '<h1>ejs</h1>')
+  })
 
-    renderer.register('ejs', {})
-    assert(Object.keys(renderer).length === 2)
-
-    renderer.use('ejs').use('no exists')
-    assert(renderer.engine === 'ejs')
+  it('no exist engine', async () => {
+    expect(() => { renderer.render('no exist', '') }).toThrow('Cannot find this render engine')
+    expect(() => { renderer.renderFile('no exist', '') }).toThrow('Cannot find this render engine')
   })
 })

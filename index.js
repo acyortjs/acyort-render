@@ -22,7 +22,7 @@ module.exports = class {
         renderFile: (path, ...params) => yaml.safeLoad(readFileSync(path, 'utf8'), ...params),
       },
       markdown: {
-        render: markdown.parse,
+        render: markdown.parse.bind(markdown),
         renderFile: (path, ...params) => markdown.parse(readFileSync(path, 'utf8'), ...params),
       },
     }
