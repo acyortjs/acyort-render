@@ -34,14 +34,14 @@ module.exports = class {
 
   render(engine, ...params) {
     if (!this.engines[engine]) {
-      throw new Error('Cannot find this render engine')
+      throw new Error(`cannot find render engine: ${engine}`)
     }
     return this.engines[engine].render(...params)
   }
 
   renderFile(engine, ...params) {
     if (!this.engines[engine]) {
-      throw new Error('Cannot find this render engine')
+      throw new Error(`cannot find render engine: ${engine}`)
     }
     return this.engines[engine].renderFile(...params)
   }

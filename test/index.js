@@ -1,20 +1,23 @@
+/* global describe it */
+/* eslint no-extend-native: 0 */
+
 const path = require('path')
 const assert = require('power-assert')
 const ejs = require('ejs')
-const Renderer = require('../')
 const fs = require('fs')
 const expect = require('expect')
+const Renderer = require('../')
 
 function dir(file) {
   return path.join(__dirname, 'fixtures', file)
 }
 
-String.prototype.trim = function() {
+String.prototype.trim = function trim() {
   return this
     .replace(/\n/g, '')
-    .replace(/[\t ]+\</g, '<')
-    .replace(/\>[\t ]+\</g, '><')
-    .replace(/\>[\t ]+$/g, '>')
+    .replace(/[\t ]+</g, '<')
+    .replace(/>[\t ]+</g, '><')
+    .replace(/>[\t ]+$/g, '>')
 }
 
 const renderer = new Renderer()
@@ -29,7 +32,7 @@ describe('renderer', () => {
     const result = renderer.render(
       'swig',
       fs.readFileSync(dir('home.html')).toString(),
-      { title: 'swig' }
+      { title: 'swig' },
     )
     assert(result.trim() === '<h1>swig</h1>')
   })
@@ -60,13 +63,13 @@ describe('renderer', () => {
       renderFile: (file, data) => {
         const text = fs.readFileSync(file).toString()
         return ejs.render(text, data)
-      }
+      },
     })
 
     let result = renderer.render(
       'ejs',
       fs.readFileSync(dir('ejs.html')).toString(),
-      { title: 'ejs' }
+      { title: 'ejs' },
     )
     assert(result.trim() === '<h1>ejs</h1>')
 
@@ -75,7 +78,7 @@ describe('renderer', () => {
   })
 
   it('no exist engine', async () => {
-    expect(() => { renderer.render('no exist', '') }).toThrow('Cannot find this render engine')
-    expect(() => { renderer.renderFile('no exist', '') }).toThrow('Cannot find this render engine')
+    expect(() => { renderer.render('no exist', '') }).toThrow('cannot find render engine: no exist')
+    expect(() => { renderer.renderFile('no exist', '') }).toThrow('cannot find render engine: no exist')
   })
 })
