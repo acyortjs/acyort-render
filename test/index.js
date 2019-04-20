@@ -1,4 +1,3 @@
-/* global describe it */
 /* eslint no-extend-native: 0 */
 
 const path = require('path')
@@ -48,13 +47,13 @@ describe('renderer', () => {
   })
 
   it('markdown render text', () => {
-    const result = renderer.render('markdown', '# h1', { simpleMode: true })
-    assert(result.trim() === '<h1>h1</h1>')
+    const result = renderer.render('markdown', '# h1', { getHeadingId: () => 'heading' })
+    assert(result.trim() === '<h1><a href="#heading" id="heading"></a>h1</h1>')
   })
 
   it('markdown render file', () => {
     const result = renderer.renderFile('markdown', dir('markdown.md'))
-    assert(result.trim() === '<h1><a href="#h1" id="h1" class="heading"></a>h1</h1>')
+    assert(result.trim() === '<h1><a href="#h1" id="h1"></a>h1</h1>')
   })
 
   it('add engine', () => {
