@@ -76,8 +76,12 @@ describe('renderer', () => {
     assert(result.trim() === '<h1>ejs</h1>')
   })
 
+  it('register exist engine', () => {
+    expect(() => { renderer.register('markdown') }).toThrow('Renderer: markdown currently exists')
+  })
+
   it('no exist engine', async () => {
-    expect(() => { renderer.render('no exist', '') }).toThrow('cannot find render engine: no exist')
-    expect(() => { renderer.renderFile('no exist', '') }).toThrow('cannot find render engine: no exist')
+    expect(() => { renderer.render('no exist', '') }).toThrow('Cannot find renderer: no exist')
+    expect(() => { renderer.renderFile('no exist', '') }).toThrow('Cannot find renderer: no exist')
   })
 })

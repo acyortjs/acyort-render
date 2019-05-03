@@ -29,19 +29,22 @@ module.exports = class {
   }
 
   register(engine, methods) {
+    if (this.engines[engine]) {
+      throw new Error(`Renderer: ${engine} currently exists`)
+    }
     this.engines[engine] = methods
   }
 
   render(engine, ...params) {
     if (!this.engines[engine]) {
-      throw new Error(`cannot find render engine: ${engine}`)
+      throw new Error(`Cannot find renderer: ${engine}`)
     }
     return this.engines[engine].render(...params)
   }
 
   renderFile(engine, ...params) {
     if (!this.engines[engine]) {
-      throw new Error(`cannot find render engine: ${engine}`)
+      throw new Error(`Cannot find renderer: ${engine}`)
     }
     return this.engines[engine].renderFile(...params)
   }
